@@ -38,7 +38,8 @@
                                         <th scope="col">No</th>
                                         <th scope="col">Name</th>
                                         <th scope="col">Date</th>
-                                        <th scope="col">Time</th>
+                                        <th scope="col">Berangkat</th>
+                                        <th scope="col">Pulang</th>
                                         <th scope="col">Location</th>
                                         <th scope="col">Jenis Absensi</th>
                                         <th scope="col">Kehadiran</th>
@@ -51,7 +52,8 @@
                                             <th scope="row">{{ $loop->iteration }}</th>
                                             <td>{{ $attendance->student->name }}</td>
                                             <td>{{ \Carbon\Carbon::parse($attendance->absence_date)->format('F j, Y') }}</td>
-                                            <td>{{ $attendance->absence_time}}</td>
+                                            <td>{{ $attendance->attendance_in}}</td>
+                                            <td>{{ $attendance->attendance_out}}</td>
                                             <td>{{ $attendance->absence_location }}</td>
                                             <td>{{ $attendance->absence_type }}</td>
                                             <td>{{ $attendance->attendance }}</td>
