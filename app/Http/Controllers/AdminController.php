@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Journal;
+use App\Models\Student;
+use App\Models\Activity;
 use App\Models\Attendance;
+use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
@@ -17,7 +19,22 @@ class AdminController extends Controller
         $attendantRecordsCount = Attendance::count();
         $journalRecordsCount = Journal::count();
 
-        return view('admin.dashboard', compact('teachersCount', 'studentsCount', 'attendantRecordsCount', 'journalRecordsCount'));
+        $recentActivities = Activity::orderBy('created_at', 'desc')->take(10)->get();
+
+        $attendanceData = [
+            'multimedia' => $this->getAttendanceData(1),
+            'tataBusana' => $this->getAttendanceData(2),
+            'pengelasan' => $this->getAttendanceData(3),
+        ];
+
+        return view('admin.dashboard', compact('teachersCount', 'studentsCount', 'attendantRecordsCount', 'journalRecordsCount', 'recentActivities', 'attendanceData'));
+    }
+
+    private function getAttendanceData($skillId)
+    {
+        return Attendance::whereHas('student', function($query) use ($skillId) {
+            $query->where('skill_id', $skillId);
+        })->selectRaw('DATE(created_at) as date, COUNT(*) as count')->groupBy('date')->pluck('count', 'date')->toArray();
     }
 
     // Report Absensi
