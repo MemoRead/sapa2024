@@ -24,23 +24,28 @@ Route::group(['middleware' => ['role:admin']], function() {
         
     // Manage Users
     Route::prefix('/admin/users')->group(function () {
-        Route::get('/user', [UserController::class, 'index'])->name('admin.users.index');
-        Route::get('/user/create', [UserController::class, 'create'])->name('admin.users.create');
-        Route::post('/user', [UserController::class, 'store'])->name('admin.users.store');
-        Route::get('/user/{id}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
-        Route::put('/user/{id}', [UserController::class, 'update'])->name('admin.users.update');
-        Route::delete('/user/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
+        Route::prefix('/user')->group(function () {
+            Route::get('/', [UserController::class, 'index'])->name('admin.users.index');
+            Route::get('/create', [UserController::class, 'create'])->name('admin.users.create');
+            Route::post('/', [UserController::class, 'store'])->name('admin.users.store');
+            Route::get('/{id}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
+            Route::put('/{id}', [UserController::class, 'update'])->name('admin.users.update');
+            Route::delete('/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
+    
+            Route::post('/upload', [UserController::class, 'upload'])->name('admin.users.upload');
+        });
 
-        Route::post('/user/upload', [UserController::class, 'upload'])->name('admin.users.upload');
+        Route::prefix('/students')->group(function () {
+            Route::get('/', [StudentController::class, 'index'])->name('admin.users.student');
+            Route::get('/create', [StudentController::class, 'create'])->name('admin.student.create');
+            Route::post('/', [StudentController::class, 'store'])->name('admin.student.store');
+            Route::get('/{id}/edit', [StudentController::class, 'edit'])->name('admin.student.edit');
+            Route::put('/{id}', [StudentController::class, 'update'])->name('admin.student.update');
+            Route::delete('/{id}', [StudentController::class, 'destroy'])->name('admin.student.destroy');
+    
+            Route::post('/upload', [StudentController::class, 'upload'])->name('admin.student.upload');
+        });
 
-        Route::get('/students', [StudentController::class, 'index'])->name('admin.users.student');
-        Route::get('/students/create', [StudentController::class, 'create'])->name('admin.student.create');
-        Route::post('/students', [StudentController::class, 'store'])->name('admin.student.store');
-        Route::get('/students/{id}/edit', [StudentController::class, 'edit'])->name('admin.student.edit');
-        Route::put('/students/{id}', [StudentController::class, 'update'])->name('admin.student.update');
-        Route::delete('/students/{id}', [StudentController::class, 'destroy'])->name('admin.student.destroy');
-
-        Route::post('/students/upload', [StudentController::class, 'upload'])->name('admin.student.upload');
 
         Route::get('/teachers', [TeacherController::class, 'index'])->name('admin.users.teacher');
     });

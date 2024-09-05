@@ -276,7 +276,7 @@
                 document.getElementById('confirm-absence-date').innerText = document.getElementById('absence_date').value;
                 document.getElementById('confirm-absence-time').innerText = document.getElementById('absence_time').value;
                 document.getElementById('confirm-absence-location').innerText = document.getElementById('absence_location').value;
-                document.getElementById('confirm-is-holiday').innerText = document.getElementById('is_holiday').checked ? 'Yes' : 'No';
+                document.getElementById('confirm-is-holiday').innerText = document.getElementById('flexSwitchCheckDefault').checked ? 'Yes' : 'No';
                 document.getElementById('confirm-absence-type').innerText = document.getElementById('absence_type').value;
                 document.getElementById('confirm-notes').innerText = document.getElementById('notes').value;
                 document.getElementById('confirm-proof-of-attendance').src = proofInput.value;
