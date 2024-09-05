@@ -37,19 +37,48 @@ class AdminController extends Controller
         })->selectRaw('DATE(created_at) as date, COUNT(*) as count')->groupBy('date')->pluck('count', 'date')->toArray();
     }
 
+    private function getDailyAttendanceData($skillId)
+    {
+        return Attendance::whereHas('student', function($query) use ($skillId) {
+            $query->where('skill_id', $skillId);
+        })->whereDate('created_at', now()->toDateString())
+        ->count();
+    }
+
+    private function getStudentsNotAttended()
+    {
+        return Student::whereDoesntHave('attendances', function($query) {
+            $query->whereDate('created_at', now()->toDateString());
+        })->get();
+    }
+
     // Report Absensi
     public function attendanceReport()
     {
+        $attendanceData = [
+            'multimedia' => $this->getDailyAttendanceData(1),
+            'tataBusana' => $this->getDailyAttendanceData(2),
+            'pengelasan' => $this->getDailyAttendanceData(3),
+        ];
+
+        $totalAttendance = array_sum($attendanceData);
+
+        $studentsNotAttended = $this->getStudentsNotAttended();
+        
+        $currentDate = now()->locale('id')->isoFormat('dddd, D MMMM YYYY');
+
         // Mengambil semua data absensi
         $attendanceReports = Attendance::all();
-        return view('admin.attendance_report', compact('attendanceReports'));
+
+        return view('admin.attendance_report', compact('attendanceReports', 'attendanceData', 'totalAttendance', 'studentsNotAttended', 'currentDate'));
     }
 
     // Report Jurnal
     public function journalReport()
     {
-        // Mengambil semua data jurnal
-        $journalReports = Journal::all();
-        return view('admin.journal_report', compact('journalReports'));
+        $journalReports = Attendance::with('student')->get();
+        $journals = Journal::all();
+
+        return view('admin.journal_report', compact('journalReports', 'journals'));
     }
 }

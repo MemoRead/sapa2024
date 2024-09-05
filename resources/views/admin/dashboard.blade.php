@@ -2,37 +2,37 @@
 @section('title', 'Admin Dashboard')
 
 @section('container')
-  <div class="pagetitle">
+<div class="pagetitle">
     <h1>Dashboard</h1>
     <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item active"><a href="{{ route('admin.dashboard') }}">Home</a></li>
         </ol>
     </nav>
-  </div><!-- End Page Title -->
+</div><!-- End Page Title -->
 
-  <section class="section">
-      <div class="row">
-          <div class="col-lg-12">
-              <div class="card info-card sales-card text-center">
-                  <div class="card-body ">
-                      <h5 class="card-title">Welcome <span>| {{ auth()->user()->name }}</span></h5>
-                      <div>
-                          <form class="d-flex align-items-center justify-content-center" action="{{ route('logout') }}" method="post">
-                              @csrf
-                              <button class="btn btn-warning small pt-1 fw-bold text-white" type="submit">
-                                  <i class="bi box-arrow-right text-white"></i> Logout
-                              </button>
-                          </form>
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card info-card sales-card text-center">
+                <div class="card-body ">
+                    <h5 class="card-title">Welcome <span>| {{ auth()->user()->name }}</span></h5>
+                    <div>
+                        <form class="d-flex align-items-center justify-content-center" action="{{ route('logout') }}" method="post">
+                            @csrf
+                            <button class="btn btn-warning small pt-1 fw-bold text-white" type="submit">
+                                <i class="bi box-arrow-right text-white"></i> Logout
+                            </button>
+                        </form>
 
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-  <section class="section dashboard">
+<section class="section dashboard">
     <div class="row">
         <div class="col-lg-12">
             <div class="row">
