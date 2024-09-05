@@ -93,24 +93,24 @@
         </div>
     </section>
 
-
     <script>
-      document.addEventListener('DOMContentLoaded', function () {
-          document.querySelectorAll('.read-more').forEach(function (element) {
-              element.addEventListener('click', function () {
-                  var shortContent = this.previousElementSibling.previousElementSibling;
-                  var fullContent = this.previousElementSibling;
-                  if (fullContent.style.display === 'none') {
-                      fullContent.style.display = 'inline';
-                      shortContent.style.display = 'none';
-                      this.textContent = 'Read Less';
-                  } else {
-                      fullContent.style.display = 'none';
-                      shortContent.style.display = 'inline';
-                      this.textContent = 'Read More';
-                  }
-              });
-          });
-      });
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.read-more').forEach(function (element) {
+                element.addEventListener('click', function () {
+                    var shortContent = this.previousElementSibling.previousElementSibling;
+                    var fullContent = this.previousElementSibling;
+                    if (fullContent.style.display === 'none') {
+                        fullContent.style.display = 'inline';
+                        shortContent.style.display = 'none';
+                        this.textContent = 'Read Less';
+                    } else {
+                        fullContent.style.display = 'none';
+                        shortContent.style.display = 'inline';
+                        this.textContent = 'Read More';
+                    }
+                });
+            });
+        });
     </script>
+
 @endsection
