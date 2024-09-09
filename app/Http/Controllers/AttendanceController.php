@@ -96,4 +96,35 @@ class AttendanceController extends Controller
         // Pass the attendance data to the view
         return view('student.attendance.recap', compact('attendances'));
     }
+
+    public function studentsNotAttended(Request $request)
+    {
+        $currentDate = now()->format('Y-m-d');
+        $studentsNotAttended = Student::whereDoesntHave('attendances', function ($query) use ($currentDate) {
+            $query->where('absence_date', $currentDate);
+        })->paginate(10);
+
+        if ($request->ajax()) {
+            return view('admin.report.partials.students_not_attended_table', compact('studentsNotAttended'))->render();
+        }
+
+        return view('admin.report.index', compact('studentsNotAttended'));
+    }
+
+    public function attendanceHistory(Request $request)
+    {
+        $skillId = $request->get('skill_id');  // mendapatkan skill_id dari request
+        $date = now()->format('Y-m-d');
+
+        // Ambil data absensi berdasarkan keterampilan siswa dan tanggal
+        $attendanceReports = Attendance::whereHas('student', function($query) use ($skillId) {
+            $query->where('skill_id', $skillId); // skill_id berasal dari tabel students
+        })->whereDate('created_at', $date)->paginate(10);
+
+        if ($request->ajax()) {
+            return view('admin.report.partials.attendance_history_table', compact('attendanceReports'))->render();
+        }
+
+        return view('admin.report.index', compact('attendanceReports'));
+    }
 }

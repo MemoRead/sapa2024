@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Skill;
 use App\Models\Journal;
 use App\Models\Student;
 use App\Models\Activity;
@@ -30,55 +32,68 @@ class AdminController extends Controller
         return view('admin.dashboard', compact('teachersCount', 'studentsCount', 'attendantRecordsCount', 'journalRecordsCount', 'recentActivities', 'attendanceData'));
     }
 
-    private function getAttendanceData($skillId)
-    {
-        return Attendance::whereHas('student', function($query) use ($skillId) {
-            $query->where('skill_id', $skillId);
-        })->selectRaw('DATE(created_at) as date, COUNT(*) as count')->groupBy('date')->pluck('count', 'date')->toArray();
-    }
-
-    private function getDailyAttendanceData($skillId)
-    {
-        return Attendance::whereHas('student', function($query) use ($skillId) {
-            $query->where('skill_id', $skillId);
-        })->whereDate('created_at', now()->toDateString())
-        ->count();
-    }
-
-    private function getStudentsNotAttended()
-    {
-        return Student::whereDoesntHave('attendances', function($query) {
-            $query->whereDate('created_at', now()->toDateString());
-        })->get();
-    }
-
     // Report Absensi
     public function attendanceReport()
     {
-        $attendanceData = [
-            'multimedia' => $this->getDailyAttendanceData(1),
-            'tataBusana' => $this->getDailyAttendanceData(2),
-            'pengelasan' => $this->getDailyAttendanceData(3),
-        ];
 
-        $totalAttendance = array_sum($attendanceData);
+        // Mengambil data absensi dengan pagination
+        $attendanceReports = Attendance::with('student')
+                                        ->orderBy('created_at', 'desc')
+                                        ->paginate(10); // Mengambil 10 data per halaman
 
-        $studentsNotAttended = $this->getStudentsNotAttended();
+                                        
+        $currentDate = Carbon::now()->format('Y-m-d');
+
+        // Data absensi per keterampilan
+        $skills = Skill::all(); // Ambil semua keterampilan
         
-        $currentDate = now()->locale('id')->isoFormat('dddd, D MMMM YYYY');
+        $attendanceData = [];
+        $totalStudentsBySkill = [];
 
-        // Mengambil semua data absensi
-        $attendanceReports = Attendance::all();
+        foreach ($skills as $skill) {
+            $students = Student::where('skill_id', $skill->id)->count();
+            $attendanceCount = Attendance::whereDate('absence_date', $currentDate)
+                                            ->whereHas('student', function ($query) use ($skill) {
+                                                $query->where('skill_id', $skill->id);
+                                            })->count();
 
-        return view('admin.attendance_report', compact('attendanceReports', 'attendanceData', 'totalAttendance', 'studentsNotAttended', 'currentDate'));
+            $attendanceData[$skill->name] = $attendanceCount;
+            $totalStudentsBySkill[$skill->name] = $students;
+        }
+
+        // Siswa yang belum melakukan absensi
+        $studentsNotAttended = Student::whereDoesntHave('attendances', function ($query) use ($currentDate) {
+            $query->whereDate('absence_date', $currentDate);
+        })->paginate(10); // Sesuaikan pagination jika diperlukan
+
+        // Total absensi hari ini
+        $totalAttendance = $attendanceReports->count();
+        $totalStudents = Student::count();
+
+        return view('admin.attendance_report', [
+            'attendanceData' => $attendanceData,
+            'totalStudentsBySkill' => $totalStudentsBySkill,
+            'studentsNotAttended' => $studentsNotAttended,
+            'attendanceReports' => $attendanceReports,
+            'totalAttendance' => $totalAttendance,
+            'totalStudents' => $totalStudents,
+            'currentDate' => $currentDate
+        ]);
     }
 
     // Report Jurnal
     public function journalReport()
     {
-        $journalReports = Attendance::with('student')->get();
-        $journals = Journal::all();
+        $journalReports = Attendance::with('student')->paginate(10);
+        $journals = Journal::paginate(10);
 
         return view('admin.journal_report', compact('journalReports', 'journals'));
+    }
+
+    private function getAttendanceData($skillId)
+    {
+        return Attendance::whereHas('student', function($query) use ($skillId) {
+            $query->where('skill_id', $skillId);
+        })->selectRaw('DATE(created_at) as date, COUNT(*) as count')->groupBy('date')->pluck('count', 'date')->toArray();
     }
 }
